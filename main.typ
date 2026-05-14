@@ -242,8 +242,6 @@
 
 = Таблицы результатов измерений и расчетов
 
-// В соответствии с заданием преподавателя, для построения резонансных кривых фиксируются значения токов и напряжений на 9 различных частотах: одна точка далеко до резонанса, несколько точек вблизи резонанса, точка самого резонанса $f_0$, и симметричные точки после резонанса.
-
 // ==========================================
 // АВТОМАТИЧЕСКИЙ РАСЧЕТ ДЛЯ ПОСЛЕДОВАТЕЛЬНОГО КОНТУРА
 // ==========================================
@@ -262,8 +260,9 @@
   )
 }
 
-// Массив частот: далеко (20), средне (80), близко (120, 127), резонанс, и симметрично после
-#let freqs_ser = (20, f0_ser - 9, f0_ser - 6, f0_ser - 3, f0_ser, f0_ser + 3, f0_ser + 6, f0_ser + 9, 240)
+// ИСПРАВЛЕНИЕ: Берем округленную f0 для шагов, чтобы получить целые частоты 121, 124 и т.д.
+#let f0_s_int = calc.round(f0_ser)
+#let freqs_ser = (20, f0_s_int - 9, f0_s_int - 6, f0_s_int - 3, f0_ser, f0_s_int + 3, f0_s_int + 6, f0_s_int + 9, 240)
 #let tbl_ser_content = ()
 
 #for (i, f) in freqs_ser.enumerate() {
@@ -278,11 +277,9 @@
   for item in row_data { tbl_ser_content.push(item) }
 }
 
-//В таблице @res-table-series представлены данные для последовательного контура. //Расчетные значения заполнены автоматически на основе параметров контура: $L_K = #_fmt(V_ser.L)$ мГн, $C = #_fmt(V_ser.C)$ мкФ, $r_"к1" = #_fmt(V_ser.rk)$ Ом.
-
 #unbreakable[
 #figure(
-  caption: [Резонансные характеристики последовательного контура], //($f_0 = #_fmt(f0_ser, digits: 3)$ Гц)
+  caption: [Резонансные характеристики последовательного контура],
   table(
     columns: (auto, auto, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
     align: center + horizon,
@@ -316,14 +313,15 @@
   )
 }
 
-// Массив частот для параллельного контура (f0 ~ 91.7 Гц)
-#let freqs_par = (10, f0_par - 9, f0_par - 6, f0_par - 3, f0_par, f0_par + 3, f0_par + 6, f0_par + 9, 180)
+// ИСПРАВЛЕНИЕ: Берем округленную f0 для шагов, чтобы получить целые частоты 83, 86 и т.д.
+#let f0_p_int = calc.round(f0_par)
+#let freqs_par = (10, f0_p_int - 9, f0_p_int - 6, f0_p_int - 3, f0_par, f0_p_int + 3, f0_p_int + 6, f0_p_int + 9, 180)
 #let tbl_par_content = ()
 
 #for (i, f) in freqs_par.enumerate() {
   if i == 0 { tbl_par_content.push(table.cell(rowspan: 4)[До рез.]) }
   if i == 4 { tbl_par_content.push(table.cell(rowspan: 1)[Рез.]) }
-  if i == 5 { tbl_par_content.push(table.cell(rowspan: 4)[После\ рез.]) }
+  if i == 5 { tbl_par_content.push(table.cell(rowspan: 4)[После рез.]) }
 
   let f_fmt = if f == f0_par { _fmt(f, digits: 3) } else { _fmt(f, digits: 0) }
   tbl_par_content.push(f_fmt)
@@ -332,10 +330,8 @@
   for item in row_data { tbl_par_content.push(item) }
 }
 
-// В таблице @res-table-parallel представлены данные для параллельного контура при двух значениях добавочного сопротивления генератора.
-
 #figure(
-  caption: [Характеристики параллельного контура], //($f_0 = #_fmt(f0_par, digits: 3)$ Гц)
+  caption: [Характеристики параллельного контура],
   table(
     columns: (3em, 3em, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
     align: center + horizon,
