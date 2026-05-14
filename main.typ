@@ -240,6 +240,117 @@
   caption: [АЧХ и ФЧХ параллельного колебательного контура]
 ) <mathcad-parallel>
 
+= Таблицы результатов измерений и расчетов
+
+// В соответствии с заданием преподавателя, для построения резонансных кривых фиксируются значения токов и напряжений на 9 различных частотах: одна точка далеко до резонанса, несколько точек вблизи резонанса, точка самого резонанса $f_0$, и симметричные точки после резонанса.
+
+// ==========================================
+// АВТОМАТИЧЕСКИЙ РАСЧЕТ ДЛЯ ПОСЛЕДОВАТЕЛЬНОГО КОНТУРА
+// ==========================================
+#let get_series_row(f) = {
+  let w = 2 * calc.pi * f
+  let XL = w * L1_H
+  let XC = 1 / (w * C1_F)
+  let Z = calc.sqrt(calc.pow(V_ser.rk, 2) + calc.pow(XL - XC, 2))
+  let I = V_ser.U / Z
+  let UC = I * XC
+  let Uk = I * calc.sqrt(calc.pow(V_ser.rk, 2) + calc.pow(XL, 2))
+  return (
+    _fmt(I * 1000, digits: 3), [],
+    _fmt(UC, digits: 3), [],
+    _fmt(Uk, digits: 3), []
+  )
+}
+
+// Массив частот: далеко (20), средне (80), близко (120, 127), резонанс, и симметрично после
+#let freqs_ser = (20, f0_ser - 9, f0_ser - 6, f0_ser - 3, f0_ser, f0_ser + 3, f0_ser + 6, f0_ser + 9, 240)
+#let tbl_ser_content = ()
+
+#for (i, f) in freqs_ser.enumerate() {
+  if i == 0 { tbl_ser_content.push(table.cell(rowspan: 4)[До рез.]) }
+  if i == 4 { tbl_ser_content.push(table.cell(rowspan: 1)[Рез.]) }
+  if i == 5 { tbl_ser_content.push(table.cell(rowspan: 4)[После рез.]) }
+
+  let f_fmt = if f == f0_ser { _fmt(f, digits: 3) } else { _fmt(f, digits: 0) }
+  tbl_ser_content.push(f_fmt)
+
+  let row_data = get_series_row(f)
+  for item in row_data { tbl_ser_content.push(item) }
+}
+
+В таблице @res-table-series представлены данные для последовательного контура. Расчетные значения заполнены автоматически на основе параметров контура: $L_K = #_fmt(V_ser.L)$ мГн, $C = #_fmt(V_ser.C)$ мкФ, $r_"к1" = #_fmt(V_ser.rk)$ Ом.
+
+#figure(
+  caption: [Резонансные характеристики последовательного контура], //($f_0 = #_fmt(f0_ser, digits: 3)$ Гц)
+  table(
+    columns: (auto, auto, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
+    align: center + horizon,
+    table.header(
+      table.cell(rowspan: 2)[Режим],
+      table.cell(rowspan: 2)[$f$, Гц],
+      table.cell(colspan: 2)[$I$, мА],
+      table.cell(colspan: 2)[$U_C$, В],
+      table.cell(colspan: 2)[$U_k$, В],
+      [Расчет], [Опыт], [Расчет], [Опыт], [Расчет], [Опыт]
+    ),
+    ..tbl_ser_content
+  )
+) <res-table-series>
+
+// ==========================================
+// АВТОМАТИЧЕСКИЙ РАСЧЕТ ДЛЯ ПАРАЛЛЕЛЬНОГО КОНТУРА
+// ==========================================
+#let get_parallel_row(f) = {
+  let detuning = f / f0_par - f0_par / f
+  let Uk1 = Uk0_1 / calc.sqrt(1 + calc.pow(Q1_pr * detuning, 2))
+  let phi1 = - calc.atan(Q1_pr * detuning).deg()
+
+  let Uk2 = Uk0_2 / calc.sqrt(1 + calc.pow(Q2_pr * detuning, 2))
+  let phi2 = - calc.atan(Q2_pr * detuning).deg()
+
+  return (
+    _fmt(Uk1, digits: 3), [], _fmt(phi1, digits: 3), [],
+    _fmt(Uk2, digits: 3), [], _fmt(phi2, digits: 3), []
+  )
+}
+
+// Массив частот для параллельного контура (f0 ~ 91.7 Гц)
+#let freqs_par = (10, f0_par - 9, f0_par - 6, f0_par - 3, f0_par, f0_par + 3, f0_par + 6, f0_par + 9, 180)
+#let tbl_par_content = ()
+
+#for (i, f) in freqs_par.enumerate() {
+  if i == 0 { tbl_par_content.push(table.cell(rowspan: 4)[До рез.]) }
+  if i == 4 { tbl_par_content.push(table.cell(rowspan: 1)[Рез.]) }
+  if i == 5 { tbl_par_content.push(table.cell(rowspan: 4)[После\ рез.]) }
+
+  let f_fmt = if f == f0_par { _fmt(f, digits: 3) } else { _fmt(f, digits: 0) }
+  tbl_par_content.push(f_fmt)
+
+  let row_data = get_parallel_row(f)
+  for item in row_data { tbl_par_content.push(item) }
+}
+
+// В таблице @res-table-parallel представлены данные для параллельного контура при двух значениях добавочного сопротивления генератора.
+
+#figure(
+  caption: [Характеристики параллельного контура], //($f_0 = #_fmt(f0_par, digits: 3)$ Гц)
+  table(
+    columns: (3em, 3em, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
+    align: center + horizon,
+    table.header(
+      table.cell(rowspan: 3)[Режим],
+      table.cell(rowspan: 3)[$f$, Гц],
+      table.cell(colspan: 4)[При $R_"д1" = #_fmt(V_par.Rd1)$ кОм],
+      table.cell(colspan: 4)[При $R_"д2" = #_fmt(V_par.Rd2)$ кОм],
+
+      table.cell(colspan: 2)[$U_k$, В], table.cell(colspan: 2)[$phi$, град.],
+      table.cell(colspan: 2)[$U_k$, В], table.cell(colspan: 2)[$phi$, град.],
+
+      [Расч.], [Опыт], [Расч.], [Опыт], [Расч.], [Опыт], [Расч.], [Опыт]
+    ),
+    ..tbl_par_content
+  )
+) <res-table-parallel>
 
 // #heading(numbering: none)[Вывод]
 // В ходе выполнения лабораторной работы были исследованы явления резонанса напряжений в последовательном и резонанса токов в параллельном колебательных контурах.
