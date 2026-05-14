@@ -1,5 +1,5 @@
 #import "@preview/modern-g7-32:0.2.0": *
-#import "@local/typst-bsuir-core:1.16.18": * // Проверьте версию вашей библиотеки
+#import "@local/typst-bsuir-core:1.16.18": *
 #import "@preview/zap:0.5.0"
 
 #set text(font: "Times New Roman", size: 14pt)
