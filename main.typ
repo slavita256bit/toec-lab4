@@ -267,13 +267,13 @@
 
 // ИСПРАВЛЕНИЕ: Берем округленную f0 для шагов, чтобы получить целые частоты 121, 124 и т.д.
 #let f0_s_int = calc.round(f0_ser)
-#let freqs_ser = (20, f0_s_int - 9, f0_s_int - 6, f0_s_int - 3, f0_ser, f0_s_int + 3, f0_s_int + 6, f0_s_int + 9, 240)
+#let freqs_ser = (50, f0_s_int - 18, f0_s_int - 15, f0_s_int - 12, f0_s_int - 9, f0_s_int - 6, f0_s_int - 3, f0_ser, f0_s_int + 3, f0_s_int + 6, f0_s_int + 9, f0_s_int + 12, f0_s_int + 15, f0_s_int + 18, 200)
 #let tbl_ser_content = ()
 
 #for (i, f) in freqs_ser.enumerate() {
-  if i == 0 { tbl_ser_content.push(table.cell(rowspan: 4)[До рез.]) }
-  if i == 4 { tbl_ser_content.push(table.cell(rowspan: 1)[Рез.]) }
-  if i == 5 { tbl_ser_content.push(table.cell(rowspan: 4)[После рез.]) }
+  if i == 0 { tbl_ser_content.push(table.cell(rowspan: 7)[До рез.]) }
+  if i == 7 { tbl_ser_content.push(table.cell(rowspan: 1)[Рез.]) }
+  if i == 8 { tbl_ser_content.push(table.cell(rowspan: 7)[После рез.]) }
 
   let f_fmt = if f == f0_ser { _fmt(f, digits: 3) } else { _fmt(f, digits: 0) }
   tbl_ser_content.push(f_fmt)
@@ -320,13 +320,13 @@
 
 // ИСПРАВЛЕНИЕ: Берем округленную f0 для шагов, чтобы получить целые частоты 83, 86 и т.д.
 #let f0_p_int = calc.round(f0_par)
-#let freqs_par = (10, f0_p_int - 9, f0_p_int - 6, f0_p_int - 3, f0_par, f0_p_int + 3, f0_p_int + 6, f0_p_int + 9, 180)
+#let freqs_par = (50, f0_p_int - 18, f0_p_int - 15, f0_p_int - 12, f0_p_int - 9, f0_p_int - 6, f0_p_int - 3, f0_par, f0_p_int + 3, f0_p_int + 6, f0_p_int + 9, f0_p_int + 12, f0_p_int + 15, f0_p_int + 18, 180)
 #let tbl_par_content = ()
 
 #for (i, f) in freqs_par.enumerate() {
-  if i == 0 { tbl_par_content.push(table.cell(rowspan: 4)[До рез.]) }
-  if i == 4 { tbl_par_content.push(table.cell(rowspan: 1)[Рез.]) }
-  if i == 5 { tbl_par_content.push(table.cell(rowspan: 4)[После рез.]) }
+  if i == 0 { tbl_par_content.push(table.cell(rowspan: 7)[До рез.]) }
+  if i == 7 { tbl_par_content.push(table.cell(rowspan: 1)[Рез.]) }
+  if i == 8 { tbl_par_content.push(table.cell(rowspan: 7)[После рез.]) }
 
   let f_fmt = if f == f0_par { _fmt(f, digits: 3) } else { _fmt(f, digits: 0) }
   tbl_par_content.push(f_fmt)
@@ -335,6 +335,7 @@
   for item in row_data { tbl_par_content.push(item) }
 }
 
+#unbreakable[
 #figure(
   caption: [Характеристики параллельного контура],
   table(
@@ -354,7 +355,7 @@
     ..tbl_par_content
   )
 ) <res-table-parallel>
-
+]
 // #heading(numbering: none)[Вывод]
 // В ходе выполнения лабораторной работы были исследованы явления резонанса напряжений в последовательном и резонанса токов в параллельном колебательных контурах.
 //
