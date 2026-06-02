@@ -1,6 +1,8 @@
 #import "@preview/modern-g7-32:0.2.0": *
-#import "@local/typst-bsuir-core:1.16.18": *
+#import "@local/typst-bsuir-core:1.17.6": *
 #import "@preview/zap:0.5.0"
+#import "@preview/cetz:0.5.0"
+#import "@preview/cetz-plot:0.1.3": plot
 
 #set text(font: "Times New Roman", size: 14pt)
 #show math.equation: set text(font: "STIX Two Math", size: 14pt)
@@ -90,7 +92,7 @@
 
 == Последовательный колебательный контур
 
-Исходные данные варианта #V_ser.brigade представлены в таблице @src-table-1. //Напряжение генератора принято равным $U = 3","5$ В .
+Исходные данные варианта #V_ser.brigade представлены в таблице @src-table-1.
 
 #figure(
   caption: [Исходные данные для последовательного контура],
@@ -139,12 +141,12 @@
 
 Зависимости тока в цепи и напряжений на элементах контура от частоты описываются уравнениями:
 #mathtype-mimic(spacing: 1em)[
-  $ I(f) &= U / sqrt(r_"k1"^2 + (2 pi f L_K - 1 / (2 pi f C))^2); $
-  $ U_C (f) &= I(f) dot 1 / (2 pi f C); $
-  $ U_L (f) &= I(f) dot 2 pi f L_K. $
+  $ I(f) &= U / sqrt(r_"k1"^2 + (2 pi f L_K - 1 / (2pi""f""C))^2); $
+  $ U_C (f) &= I(f) dot 1 / (2pi""f""C); $
+  $ U_L (f) &= I(f) dot sqrt(r_"k1"^2 + (2 pi f L_K)^2). $
 ]
 
-Расчет и построение резонансных кривых тока $I(f)$, напряжения на емкости $U_C (f)$ и напряжения на идеальной индуктивности $U_L (f)$ представлены на рисунке @mathcad-series.
+Расчет и построение резонансных кривых тока $I(f)$, напряжения на емкости $U_C (f)$ и напряжения на катушке индуктивности $U_K (f)$ представлены на рисунке @mathcad-series.
 
 #figure(
   gap: 1em,
@@ -153,7 +155,7 @@
 ) <mathcad-series>
 
 
-== Параллельный колебательный контур
+== Параллельный колебательный контур (теоретический расчет)
 
 Исходные данные для параллельного контура представлены в таблице @src-table-2.
 
@@ -168,40 +170,6 @@
     [#V_par.brigade], [#V_par.C], [#V_par.U], [#V_par.Rd1], [#V_par.Rd2], [#V_par.L], [#V_par.rk]
   )
 ) <src-table-2>
-
-Схема электрической цепи для исследования резонанса токов представлена на рисунке @src-circuit-2.
-
-#lab-figure(
-  above: -2em,
-  gap: 0em,
-  caption: [Схема для исследования параллельного колебательного контура],
-  circuit-better(scale-factor: 80%, {
-    import zap: *
-    node-better("T0", (0, 6), visible: false)
-    node-better("B0", (0, 0), visible: false)
-    node-better("T1", (4, 6), visible: true)
-    node-better("B1", (4, 0), visible: true)
-    node-better("T2", (8, 6), visible: true)
-    node-better("B2", (8, 0), visible: true)
-    node-better("T3", (12, 6), visible: false)
-    node-better("M3", (12, 3), visible: false)
-    node-better("B3", (12, 0), visible: false)
-
-    open-branch-better("U_in", "T0", "B0", label: $dot(U)$, arrow-side: "left", arrow-dir: "down")
-
-    wire("T0", "T1")
-    resistor-better("Rd", "T1", "B1", label: (content: $R_"д"$, anchor: "left"))
-
-    wire("T1", "T2")
-    capacitor-better("C", "T2", "B2", label: (content: $C$, anchor: "left"))
-
-    wire("T2", "T3")
-    inductor-better("L", "T3", "M3", label: (content: $L_2$, anchor: "left"))
-    resistor-better("rk", "M3", "B3", label: (content: $r_"k2"$, anchor: "left"))
-
-    wire("B0", "B3")
-  })
-) <src-circuit-2>
 
 Рассчитаем параметры параллельного контура: резонансную частоту $f_0$, характеристическое сопротивление $rho$, эквивалентное сопротивление при резонансе $R_0$ и собственную добротность $Q$.
 
@@ -230,14 +198,8 @@
   $ U_("k0"_2) &= U dot R_0 / (R_0 + R_("д2")) = #V_par.U dot #R0_par / (#R0_par + #Rd2_ohm) = #Uk0_2 " В". $
 ]
 ]
-#v(0.5em)
-Амплитудно-частотная $U_k (f)$ и фазочастотная $phi (f)$ характеристики контура определяются выражениями:
-#mathtype-mimic(spacing: 1em)[
-  $ U_k (f) = U_"k0" / sqrt(1 + (Q' (f / f_0 - f_0 / f))^2); $
-  $ phi (f) = - "arctg" (Q' (f / f_0 - f_0 / f)). $
 ]
-]
-Результаты представлены на рисунке @mathcad-parallel.
+Результаты построения АЧХ и ФЧХ в среде Mathcad представлены на рисунке @mathcad-parallel.
 
 #figure(
   gap: 1em,
@@ -245,41 +207,41 @@
   caption: [АЧХ и ФЧХ параллельного колебательного контура]
 ) <mathcad-parallel>
 
-= Таблицы результатов измерений и расчетов
+= Экспериментальная часть
 
 // ==========================================
-// АВТОМАТИЧЕСКИЙ РАСЧЕТ ДЛЯ ПОСЛЕДОВАТЕЛЬНОГО КОНТУРА
+// ОПЫТНЫЕ ДАННЫЕ (ИЗ ФОТО)
 // ==========================================
-#let get_series_row(f) = {
+#let freqs_ser  = (50, 120, 123, 126, 128, 130, 132, 135, 138, 140, 200)
+#let exp_I_ser  = (7.4, 64.5, 74.2, 84.6, 91.0, 109.6, 99.7, 98.3, 91.6, 85.7, 20.2)
+#let exp_Uk_ser = (0.616, 13.03, 15.62, 18.99, 20.8, 22.5, 24.1, 24.3, 22.2, 20.8, 6.3)
+#let exp_Uc_ser = (4.08, 15.77, 18.01, 20.5, 22.2, 23.2, 24.2, 25.2, 20.1, 18.87, 2.74)
+
+#let tbl_ser_content = ()
+
+#for (i, f) in freqs_ser.enumerate() {
+  if i == 0 { tbl_ser_content.push(table.cell(rowspan: 5)[До рез.]) }
+  if i == 5 { tbl_ser_content.push(table.cell(rowspan: 1)[Рез.]) }
+  if i == 6 { tbl_ser_content.push(table.cell(rowspan: 5)[После рез.]) }
+
+  tbl_ser_content.push(_fmt(f, digits: 0))
+
   let w = 2 * calc.pi * f
   let XL = w * L1_H
   let XC = 1 / (w * C1_F)
   let Z = calc.sqrt(calc.pow(V_ser.rk, 2) + calc.pow(XL - XC, 2))
-  let I = V_ser.U / Z
-  let UC = I * XC
-  let Uk = I * calc.sqrt(calc.pow(V_ser.rk, 2) + calc.pow(XL, 2))
-  return (
-    _fmt(I * 1000, digits: 3), [],
-    _fmt(UC, digits: 3), [],
-    _fmt(Uk, digits: 3), []
-  )
-}
+  let I_calc = V_ser.U / Z
+  let UC_calc = I_calc * XC
+  let Uk_calc = I_calc * calc.sqrt(calc.pow(V_ser.rk, 2) + calc.pow(XL, 2))
 
-// ИСПРАВЛЕНИЕ: Берем округленную f0 для шагов, чтобы получить целые частоты 121, 124 и т.д.
-#let f0_s_int = calc.round(f0_ser)
-#let freqs_ser = (50, f0_s_int - 18, f0_s_int - 15, f0_s_int - 12, f0_s_int - 9, f0_s_int - 6, f0_s_int - 3, f0_ser, f0_s_int + 3, f0_s_int + 6, f0_s_int + 9, f0_s_int + 12, f0_s_int + 15, f0_s_int + 18, 200)
-#let tbl_ser_content = ()
+  tbl_ser_content.push(_fmt(I_calc * 1000, digits: 3))
+  tbl_ser_content.push(_fmt(exp_I_ser.at(i), digits: 1))
 
-#for (i, f) in freqs_ser.enumerate() {
-  if i == 0 { tbl_ser_content.push(table.cell(rowspan: 7)[До рез.]) }
-  if i == 7 { tbl_ser_content.push(table.cell(rowspan: 1)[Рез.]) }
-  if i == 8 { tbl_ser_content.push(table.cell(rowspan: 7)[После рез.]) }
+  tbl_ser_content.push(_fmt(UC_calc, digits: 3))
+  tbl_ser_content.push(_fmt(exp_Uc_ser.at(i), digits: 2))
 
-  let f_fmt = if f == f0_ser { _fmt(f, digits: 3) } else { _fmt(f, digits: 0) }
-  tbl_ser_content.push(f_fmt)
-
-  let row_data = get_series_row(f)
-  for item in row_data { tbl_ser_content.push(item) }
+  tbl_ser_content.push(_fmt(Uk_calc, digits: 3))
+  tbl_ser_content.push(_fmt(exp_Uk_ser.at(i), digits: 2))
 }
 
 #unbreakable[
@@ -302,63 +264,152 @@
 ]
 
 // ==========================================
-// АВТОМАТИЧЕСКИЙ РАСЧЕТ ДЛЯ ПАРАЛЛЕЛЬНОГО КОНТУРА
+// ОБРАБОТКА ДАННЫХ И ПОСТРОЕНИЕ ГРАФИКОВ
 // ==========================================
-#let get_parallel_row(f) = {
-  let detuning = f / f0_par - f0_par / f
-  let Uk1 = Uk0_1 / calc.sqrt(1 + calc.pow(Q1_pr * detuning, 2))
-  let phi1 = - calc.atan(Q1_pr * detuning).deg()
-
-  let Uk2 = Uk0_2 / calc.sqrt(1 + calc.pow(Q2_pr * detuning, 2))
-  let phi2 = - calc.atan(Q2_pr * detuning).deg()
-
-  return (
-    _fmt(Uk1, digits: 3), [], _fmt(phi1, digits: 3), [],
-    _fmt(Uk2, digits: 3), [], _fmt(phi2, digits: 3), []
-  )
+#let _pair_freqs_with(values, freqs) = {
+  let out = ()
+  for (i, v) in values.enumerate() {
+    out.push((freqs.at(i), v))
+  }
+  out
 }
 
-// ИСПРАВЛЕНИЕ: Берем округленную f0 для шагов, чтобы получить целые частоты 83, 86 и т.д.
-#let f0_p_int = calc.round(f0_par)
-#let freqs_par = (50, f0_p_int - 18, f0_p_int - 15, f0_p_int - 12, f0_p_int - 9, f0_p_int - 6, f0_p_int - 3, f0_par, f0_p_int + 3, f0_p_int + 6, f0_p_int + 9, f0_p_int + 12, f0_p_int + 15, f0_p_int + 18, 180)
-#let tbl_par_content = ()
+#let exp_I_pts  = _pair_freqs_with(exp_I_ser, freqs_ser)
+#let exp_Uc_pts = _pair_freqs_with(exp_Uc_ser, freqs_ser)
+#let exp_Uk_pts = _pair_freqs_with(exp_Uk_ser, freqs_ser)
 
-#for (i, f) in freqs_par.enumerate() {
-  if i == 0 { tbl_par_content.push(table.cell(rowspan: 7)[До рез.]) }
-  if i == 7 { tbl_par_content.push(table.cell(rowspan: 1)[Рез.]) }
-  if i == 8 { tbl_par_content.push(table.cell(rowspan: 7)[После рез.]) }
+// Вычисление Z, Xc, XL по опытным данным
+#let exp_Z_pts = ()
+#let exp_XC_pts = ()
+#let exp_XL_pts = ()
 
-  let f_fmt = if f == f0_par { _fmt(f, digits: 3) } else { _fmt(f, digits: 0) }
-  tbl_par_content.push(f_fmt)
+#for (i, f) in freqs_ser.enumerate() {
+  let I_A = exp_I_ser.at(i) / 1000
+  let z_val = V_ser.U / I_A
+  let xc_val = exp_Uc_ser.at(i) / I_A
 
-  let row_data = get_parallel_row(f)
-  for item in row_data { tbl_par_content.push(item) }
+  // X_L = sqrt(Z_k^2 - r_k^2)
+  let zk_val = exp_Uk_ser.at(i) / I_A
+  let xl_val = 0
+  if zk_val * zk_val > V_ser.rk * V_ser.rk {
+    xl_val = calc.sqrt(zk_val * zk_val - V_ser.rk * V_ser.rk)
+  }
+
+  exp_Z_pts.push((f, z_val))
+  exp_XC_pts.push((f, xc_val))
+  exp_XL_pts.push((f, xl_val))
 }
 
-#unbreakable[
-#figure(
-  caption: [Характеристики параллельного контура],
-  table(
-    columns: (3em, 3em, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
-    align: center + horizon,
-    table.header(
-      table.cell(rowspan: 3)[Режим],
-      table.cell(rowspan: 3)[$f$, Гц],
-      table.cell(colspan: 4)[При $R_"д1" = #_fmt(V_par.Rd1)$ кОм],
-      table.cell(colspan: 4)[При $R_"д2" = #_fmt(V_par.Rd2)$ кОм],
+= Обработка результатов эксперимента
 
-      table.cell(colspan: 2)[$U_k$, В], table.cell(colspan: 2)[$phi$, град.],
-      table.cell(colspan: 2)[$U_k$, В], table.cell(colspan: 2)[$phi$, град.],
-
-      [Расч.], [Опыт], [Расч.], [Опыт], [Расч.], [Опыт], [Расч.], [Опыт]
-    ),
-    ..tbl_par_content
-  )
-) <res-table-parallel>
+== Расчет и построение частотных характеристик сопротивлений
+По экспериментальным данным (таблица 3) рассчитаем значения полного сопротивления цепи $Z$, емкостного сопротивления $X_C$ и индуктивного сопротивления $X_L$:
+#mathtype-mimic(spacing: 1em)[
+  $ Z(f) = U / I(f); quad X_C (f) = U_C thin f / I(f); quad X_L (f) = sqrt((U_K (f)/I(f))^2 - r_"k1"^2). $
 ]
-// #heading(numbering: none)[Вывод]
-// В ходе выполнения лабораторной работы были исследованы явления резонанса напряжений в последовательном и резонанса токов в параллельном колебательных контурах.
-//
-// Для последовательного контура экспериментально подтверждено, что на резонансной частоте напряжения на реактивных элементах достигают максимума и могут значительно превышать входное напряжение.
-//
-// Для параллельного контура установлено, что увеличение сопротивления источника (внесение добавочного сопротивления $R_"д"$) снижает эквивалентную добротность контура $Q'$, расширяет полосу пропускания и уменьшает максимальное напряжение на контуре. Рассчитанные амплитудно- и фазочастотные характеристики соответствуют теоретическим ожиданиям.
+
+Построенные частотные характеристики сопротивлений представлены на рисунке @exp-z-plot. Из графика видно, что точка пересечения кривых $X_C(f)$ и $X_L(f)$ соответствует резонансной частоте контура.
+
+#figure(
+  gap: 1em,
+  cetz.canvas({
+    cetz.draw.set-style(axes: (x: (
+      tick: (label: (offset: 1em)),
+      label: (offset: -0.5em)
+    )))
+    plot.plot(
+      size: (14, 6),
+      axis-style: "left",
+      x-label: text(font: "Times New Roman", size: 12pt)[$f$, Гц],
+      y-label: text(font: "Times New Roman", size: 12pt)[$Z, X_C, X_L$, Ом],
+      x-min: 50, x-max: 200,
+      y-min: 0,
+      x-tick-step: 25,
+      y-tick-step: 200,
+
+      legend: "inner-north-east",
+      {
+        plot.add(exp_Z_pts,  label: $Z$,    mark: "o", mark-size: 0.10, style: (stroke: blue + 1pt))
+        plot.add(exp_XC_pts, label: $X_C$,  mark: "o", mark-size: 0.10, style: (stroke: red + 1pt))
+        plot.add(exp_XL_pts, label: $X_L$,  mark: "o", mark-size: 0.10, style: (stroke: green + 1pt))
+      }
+    )
+  }),
+  caption: [Частотные характеристики сопротивлений контура],
+) <exp-z-plot>
+
+== Построение резонансных характеристик
+Совмещенные графики зависимости тока $I$ и напряжений $U_C, U_k$ от частоты, построенные по экспериментальным точкам, показаны на рисунке @exp-series-plot.
+
+#figure(
+  gap: 1em,
+  cetz.canvas({
+    cetz.draw.set-style(axes: (x: (
+      tick: (label: (offset: 1em)),
+      label: (offset: -0.5em)
+    )))
+    plot.plot(
+      size: (14, 7),
+      axis-style: "left",
+      x-label: text(font: "Times New Roman", size: 12pt)[$f$, Гц],
+      y-label: text(font: "Times New Roman", size: 12pt)[$I$, мА; $U$, В],
+      x-min: 50, x-max: 200,
+      y-min: 0, y-max: 120,
+
+      // Заменяем автоматический шаг на списки нужных отметок (без 125 и 80)
+      x-ticks: (50, 75, 100, 175, 200),
+      y-ticks: (0, 20, 40, 60, 100, 120),
+      x-tick-step: none,
+      y-tick-step: none,
+
+      legend: "inner-north-east",
+      {
+        plot.add(exp_I_pts,  label: $I$,    mark: "o", mark-size: 0.10, style: (stroke: blue + 1pt))
+        plot.add(exp_Uc_pts, label: $U_C$, mark: "o", mark-size: 0.10, style: (stroke: red + 1pt))
+        plot.add(exp_Uk_pts, label: $U_k$, mark: "o", mark-size: 0.10, style: (stroke: green + 1pt))
+
+        plot.annotate({
+          import cetz.draw: line, content
+          let dash-style = (dash: "dashed", paint: gray, thickness: 1pt)
+
+          // Максимальный ток и резонансная частота
+          line((50, 109.6), (130, 109.6), stroke: dash-style)
+          line((130, 0), (130, 109.6), stroke: dash-style)
+
+          content((50 - 4, 109.6), box(fill: white, inset: 1pt)[$I_0$], anchor: "east")
+          content((130, -7), box(fill: white, inset: 1pt)[$f_0$], anchor: "north")
+
+          // Уровень 0.707 и граничные частоты
+          line((50, 77.5), (147.5, 77.5), stroke: dash-style)
+          line((124, 0), (124, 77.5), stroke: dash-style)
+          line((147.5, 0), (147.5, 77.5), stroke: dash-style)
+
+          content((50 - 4, 77.5), box(fill: white, inset: 1pt)[$I_0 / sqrt(2)$], anchor: "east")
+          content((124, -7), box(fill: white, inset: 1pt)[$f_1$], anchor: "north")
+          content((147.5, -7), box(fill: white, inset: 1pt)[$f_2$], anchor: "north")
+        })
+      }
+    )
+  }),
+  caption: [Экспериментальные резонансные кривые последовательного контура],
+) <exp-series-plot>
+
+== Определение добротности контура различными способами
+
+По графикам на рисунке @exp-series-plot определим добротность
+#mathtype-mimic(spacing: 1em)[
+  $ Q = f_0 / (f_2 - f_1) = 130 / (147.5 - 124) = 130 / 23.5 = 5.53. $
+]
+
+// При резонансе напряжения составили: $U_("C"0) = 23","2$ В, $U_("k"0) = 22","5$ В.
+#mathtype-mimic(spacing: 1em)[
+  $ Q = U_("C"0) / U = 23.2 / 3.5 = 6.63. $
+]
+
+#mathtype-mimic(spacing: 1em)[
+//   $ rho = X_C "("thin f_0 thin")" = U_("C"0) / I_0 = 23.2 / (109.6 dot 10^(-3)) = 211.68 "Ом". $
+  $ Q = X_"C0" / r_"k1" = 211.68 / 29.4 = 7.20. $
+]
+
+#heading(numbering: none)[Вывод]
+В ходе выполнения лабораторной работы экспериментально исследован резонанс напряжений в последовательном колебательном контуре. Подтверждено, что на резонансной частоте реактивные сопротивления емкости и индуктивности равны друг другу, полное сопротивление цепи $Z$ становится минимальным. Вследствие этого ток в цепи достигает максимума, а напряжения на реактивных элементах многократно превышают входное напряжение.
