@@ -21,6 +21,8 @@
   ),
   performer: (
     name: "Ермаков В. С.",
+//     name: "Каптюг И. М.",
+//     name: "Рудаков Г. А.",
     group: "558301",
   ),
   footer: (city: "Минск", year: 2026),
@@ -210,7 +212,7 @@
 = Экспериментальная часть
 
 // ==========================================
-// ОПЫТНЫЕ ДАННЫЕ (ИЗ ФОТО)
+// ОПЫТНЫЕ ДАННЫЕ
 // ==========================================
 #let freqs_ser  = (50, 120, 123, 126, 128, 130, 132, 135, 138, 140, 200)
 #let exp_I_ser  = (7.4, 64.5, 74.2, 84.6, 91.0, 109.6, 99.7, 98.3, 91.6, 85.7, 20.2)
@@ -356,7 +358,6 @@
       x-min: 50, x-max: 200,
       y-min: 0, y-max: 120,
 
-      // Заменяем автоматический шаг на списки нужных отметок (без 125 и 80)
       x-ticks: (50, 75, 100, 175, 200),
       y-ticks: (0, 20, 40, 60, 100, 120),
       x-tick-step: none,
@@ -396,20 +397,66 @@
 
 == Определение добротности контура различными способами
 
-По графикам на рисунке @exp-series-plot определим добротность
+По графикам на рисунке @exp-series-plot (полоса пропускания) определим добротность:
 #mathtype-mimic(spacing: 1em)[
   $ Q = f_0 / (f_2 - f_1) = 130 / (147.5 - 124) = 130 / 23.5 = 5.53. $
 ]
 
-// При резонансе напряжения составили: $U_("C"0) = 23","2$ В, $U_("k"0) = 22","5$ В.
 #mathtype-mimic(spacing: 1em)[
   $ Q = U_("C"0) / U = 23.2 / 3.5 = 6.63. $
 ]
 
 #mathtype-mimic(spacing: 1em)[
-//   $ rho = X_C "("thin f_0 thin")" = U_("C"0) / I_0 = 23.2 / (109.6 dot 10^(-3)) = 211.68 "Ом". $
-  $ Q = X_"C0" / r_"k1" = 211.68 / 29.4 = 7.20. $
+  $ Q = rho / r_"k1" = 188.5 / 29.4 = 6.41. $
 ]
+
+== Векторные диаграммы
+
+На рисунках @vd-before, @vd-res и @vd-after представлены векторные диаграммы напряжений и токов для трех режимов работы последовательного колебательного контура.
+
+// В качестве опорного вектора выбран вектор тока $dot(I)$, направленный по вещественной оси (для наглядности его длина масштабирована). Напряжение на контуре образуется как сумма векторов напряжений на катушке и конденсаторе: $dot(U) = dot(U)_k + dot(U)_C$.
+
+#figure(
+  vector-diagram(
+    axes: (x: (0, 4), y: (-5, 2)),
+    chain-voltages: true,
+    currents: ((val: (re: 3, im: 0), label: $dot(I)$, color: black),),
+    voltages: (
+      (val: (re: 0.23, im: 0.56), label: move(dx:0.2em, $dot(U)_k$), color: black, anchor: "south"),
+      (val: (re: 0, im: -4.08), label: move(dx:0.2em, $dot(U)_C$), color: black, anchor: "north")
+    ),
+    sum-voltage: (label: $dot(U)$, color: black, anchor: "west")
+  ),
+  caption: [Векторная диаграмма для $f=50$ Гц ($f < f_0$)]
+) <vd-before>
+
+#figure(
+  vector-diagram(
+    axes: (x: (0, 5), y: (-2, 4)),
+    chain-voltages: true,
+    currents: ((val: (re: 4, im: 0), label: $dot(I)$, color: black),),
+    voltages: (
+      (val: (re: 3.48, im: 2.223), label: $dot(U)_k$, color: black, anchor: "west"),
+      (val: (re: 0, im: -2.32), label: move(dx: -2em, dy: -1em, $dot(U)_C$), color: black, anchor: "west")
+    ),
+    sum-voltage: (label: $dot(U)$, color: black, anchor: "north")
+  ),
+  caption: [Векторная диаграмма для $f=130$ Гц ($f = f_0$)]
+) <vd-res>
+
+#figure(
+  vector-diagram(
+    axes: (x: (0, 4), y: (-1, 8)),
+    chain-voltages: true,
+    currents: ((val: (re: 3, im: 0), label: $dot(I)$, color: black),),
+    voltages: (
+      (val: (re: 0.64, im: 6.27), label: $dot(U)_k$, color: black, anchor: "south"),
+      (val: (re: 0, im: -2.74), label: move(dy:-0.5em, $dot(U)_C$), color: black, anchor: "west")
+    ),
+    sum-voltage: (label: $dot(U)$, color: black, anchor: "north-west")
+  ),
+  caption: [Векторная диаграмма для $f=200$ Гц ($f > f_0$)]
+) <vd-after>
 
 #heading(numbering: none)[Вывод]
 В ходе выполнения лабораторной работы экспериментально исследован резонанс напряжений в последовательном колебательном контуре. Подтверждено, что на резонансной частоте реактивные сопротивления емкости и индуктивности равны друг другу, полное сопротивление цепи $Z$ становится минимальным. Вследствие этого ток в цепи достигает максимума, а напряжения на реактивных элементах многократно превышают входное напряжение.
